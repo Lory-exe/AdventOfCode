@@ -58,6 +58,34 @@ void makeAction(action_t *a, int *pointing) {
     }
 }
 
+void makeActionPart2(action_t *a, int *pointing, int *zeros) {
+    int mv = a->click;
+    int tmp;
+
+    int rounds = mv / (MAX_POINT + 1);
+    *zeros += rounds;
+
+    int rmngMv = mv % (MAX_POINT + 1);
+
+    switch (a->dir) {
+        case LEFT:
+            if ((tmp = *pointing - rmngMv) <= MIN_POINT) {
+                if (*pointing != MIN_POINT) (*zeros)++;
+                *pointing = MAX_POINT + (tmp + 1);
+            } else {
+                *pointing -= rmngMv;
+            }
+            break;
+        case RIGHT:
+            if ((tmp = *pointing + rmngMv) > MAX_POINT) {
+                if (*pointing != MAX_POINT + 1) (*zeros)++;
+                *pointing = (tmp - 1) - MAX_POINT;
+            } else {
+                *pointing += rmngMv;
+            }
+    }
+}
+
 int main(int argc, char *argv[]) {
     int pointing = STARTING_POINT, zeros = 0;
     action_t *actions;
@@ -81,8 +109,14 @@ int main(int argc, char *argv[]) {
         makeAction((actions + i), &pointing);
         if (pointing == 0) zeros++;
     }
-
-    printf("Password: %d\n", zeros);
+    printf("Password Part 1: %d\n", zeros);
+    
+    pointing = 50;
+    zeros = 0;
+    for (int i = 0; i < actionsCount; i++) {
+        makeActionPart2((actions + i), &pointing, &zeros);
+    }
+    printf("Password Part 2: %d\n", zeros);
     
     return 0;
 }
