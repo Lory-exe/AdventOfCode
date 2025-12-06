@@ -85,6 +85,35 @@ int checkValidity(long int value) {
     return 1;   // invalid ID
 }
 
+int checkValidityPart2(long int value) {
+    char *str;
+    int dim = 10;
+    if (!(str = malloc(dim * sizeof(char)))) return 1;
+
+    int size = sprintf(str, "%ld", value);
+    if (size <= 0 || !(str = realloc(str, (size + 1) * sizeof(char)))) {
+        free(str);
+        return 1;
+    }
+
+    for (int i = 1; i <= size / 2; i++) {
+        if (size % i == 0) {
+            int is_valid = 1;
+            for (int j = i; j < size; j++) {
+                if (str[j] != str[j % i]) {
+                    is_valid = 0;
+                    break;
+                }
+            }
+            if (is_valid) {
+                return 1;       // invalid ID
+            }
+        }
+    }
+
+    return 0;
+}
+
 int main(int argc, char *argv[]) {
     idRange_t *ranges;
     int rangesNum = 0;
@@ -103,18 +132,20 @@ int main(int argc, char *argv[]) {
     ranges = loadData(f, &rangesNum);
     fclose(f);
 
-    long int sum = 0;
-    int found = 0;
+    long int sum = 0, sum2 = 0;
     for (int i = 0; i < rangesNum; i++) {
         for (long int j = (ranges + i)->min; j <= (ranges + i)->max; j++) {
             if (checkValidity(j)) {
                 sum += j;
-                found++;
+            }
+            if (checkValidityPart2(j)) {
+                sum2 += j;
             }
         }
     }
 
     printf("Invalid IDs sum: %ld\n", sum);
+    printf("Invalid IDs sum pt.2: %ld\n", sum2);
 
     return 0;
 }
