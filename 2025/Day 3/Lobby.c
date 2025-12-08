@@ -1,4 +1,7 @@
 #include <bankArrayList.h>
+#include <math.h>
+
+#define DIGITS 12
 
 bank_t *loadData(FILE *f, bank_t *list) {
     char *inp, c;
@@ -55,6 +58,35 @@ int joltageRating(char *v) {
     return (ret[0] * 10 + ret[1]);
 }
 
+long int joltageRatingPart2(char *v) {
+    int ret[DIGITS] = { 0 };
+    int idx = -1;
+
+    if (v == NULL) return -1;
+
+    for (int count = 0; count < DIGITS; count++) {
+        int i = (idx + 1);
+
+        for (; i < strlen(v) - (DIGITS - 1 - count); i++) {
+            int val = v[i] - '0';
+            if (val > ret[count]) {
+                ret[count] = val;
+                idx = i;
+            }
+        }
+        if (i >= strlen(v) - (DIGITS - 1 - count)) {
+            ret[count] = v[idx] - '0';
+        }
+    }
+
+    long int value = 0;
+    for (int i = 0; i < DIGITS; i++) {
+        value += ret[i] * pow(10, DIGITS - i - 1);
+    }
+
+    return value;
+}
+
 int main(int argc, char *argv[]) {
     bank_t *banks = NULL;
 
@@ -73,13 +105,14 @@ int main(int argc, char *argv[]) {
     fclose(f);
     
     int joltageSum = 0;
+    long int joltageSumPt2 = 0;
     for (int i = 0; i < listLen(banks); i++) {
-        // printf("ELEMENT_%d:\t%s\n", i, getAt(banks, i)->batteries);
-        // printf("JOLTAGE: %d\n\n", joltageRating(getAt(banks, i)->batteries));
-        joltageSum +=joltageRating(getAt(banks, i)->batteries);
+        joltageSum += joltageRating(getAt(banks, i)->batteries);
+        joltageSumPt2 += joltageRatingPart2(getAt(banks, i)->batteries);
     }
 
     printf("Joltage Sum: %d\n", joltageSum);
+    printf("Joltage Sum Pt.2: %ld\n", joltageSumPt2);
 
     return 0;
 }
