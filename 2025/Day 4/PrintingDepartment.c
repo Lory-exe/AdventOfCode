@@ -71,8 +71,8 @@ char **loadGrid(FILE *f, int *rows, int *columns) {
 int isRoll(char c) {
     switch (c) {
         case PAPER_ROLL:
-        case CHECKED:
             return 1;
+        case CHECKED:
         default:
             return 0;
     }
@@ -141,22 +141,23 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    int checked = 0;
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < columns; j++) {
-            if (grid[i][j] == PAPER_ROLL) {
-                if (checkAdjacentRolls(grid, rows, columns, i, j) <= MAX_ADJACENT_ROLLS) {
-                    grid[i][j] = CHECKED;
-                    checked++;
-                    
+    int removed = 0, checked;
+    do {
+        checked = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                if (grid[i][j] == PAPER_ROLL) {
+                    if (checkAdjacentRolls(grid, rows, columns, i, j) <= MAX_ADJACENT_ROLLS) {
+                        grid[i][j] = CHECKED;
+                        checked++;
+                    }
                 }
             }
-            // printf("%c ", grid[i][j]);
         }
-        // printf("\n");
-    }
+        removed += checked;
+    } while(checked != 0);
 
-    printf("Accessed by a forklift: %d\n", checked);
+    printf("Total removed: %d\n", removed);
 
     return 0;
 }
