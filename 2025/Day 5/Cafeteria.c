@@ -83,6 +83,38 @@ int inRange(const range_t *ranges, const int nRanges, const long int value) {
     return 0;
 }
 
+int cmpRanges(const void *a, const void *b) {
+    const range_t *r1 = a;
+    const range_t *r2 = b;
+    return (r1->min > r2->min) - (r1->min < r2->min);
+}
+
+long int countFreshIds(range_t *ranges, int nRanges) {
+    if (nRanges == 0) return 0;
+
+    qsort(ranges, nRanges, sizeof(*ranges), cmpRanges);
+
+    long int total = 0;
+    long int currMin = ranges[0].min;
+    long int currMax = ranges[0].max;
+
+    for (int i = 1; i < nRanges; i++) {
+        if (ranges[i].min <= currMax + 1) {     // overlapping or adjacent
+            if (ranges[i].max > currMax) {
+                currMax = ranges[i].max;
+            }
+        } else {                                // new range
+            total += currMax - currMin + 1;
+            currMin = ranges[i].min;
+            currMax = ranges[i].max;
+        }
+    }
+
+    total += currMax - currMin + 1;
+    return total;
+}
+
+
 int main(int argc, char *argv[]) {
     range_t *ranges;
     long int *ids;
@@ -115,6 +147,8 @@ int main(int argc, char *argv[]) {
     }
 
     printf("Fresh ingredients: %d\n", freshIngredients);
+
+    printf("Available Fresh Ids: %ld\n", countFreshIds(ranges, nRanges));
 
     return 0;
 }
