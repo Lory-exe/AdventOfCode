@@ -42,7 +42,6 @@ exp_t *loadData(FILE *f, int *count) {
 
             if (*count >= dim) {
                 dim *= 2;
-                printf("NO REALLOC: %d\n", dim);
                 if (!(tmp = realloc(ret, dim * sizeof(*ret)))) {
                     free(ret);
                     return NULL;
@@ -106,14 +105,6 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Impossible to load data from file\n");
         return 1;
     }
-
-    // for (int i = 0; i < count; i++) {
-    //     printf("Expression_%d:", i);
-    //     for (int j = 0; j < MAX_NUMBERS; j++) {
-    //         printf("\t%d", exps[i].numbers[j]);
-    //     }
-    //     printf("\t%c\n", exps[i].operationType);
-    // }
 
     long int total = 0;
     for (int i = 0; i < count; i++) {
