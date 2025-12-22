@@ -51,6 +51,45 @@ int spreadBeam(char **diagram, const int rows, const int startX, const int start
     return splits;
 }
 
+long timeLines(char **diagram, const int rows, const int columns, const int startX, const int startY) {
+    long ret = 0;
+
+    long **paths = calloc(rows, sizeof(long *));
+    for (int i = 0; i < rows; i++) {
+        paths[i] = calloc(columns, sizeof(long));
+    }
+
+    paths[startX][startY] = 1;
+
+    for (int i = startX; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            if (paths[i][j] == 0) continue;
+
+            if (i == rows - 1) {
+                ret += paths[i][j];
+                continue;
+            }
+
+            if (diagram[i][j] == SPLIT) {
+                if (j - 1 >= 0) {
+                    paths[i + 1][j - 1] += paths[i][j];
+                }
+                if (j + 1 < columns) {
+                    paths[i + 1][j + 1] += paths[i][j];
+                }
+            } else {
+                paths[i + 1][j] += paths[i][j];
+            }
+        }
+    }
+
+    for (int i = 0; i < rows; i++) {
+        free(paths[i]);
+    }
+    free(paths);
+    return ret;
+}
+
 int main(int argc, char *argv[]) {
     char **diagram;
     int rows, columns;
@@ -91,7 +130,10 @@ int main(int argc, char *argv[]) {
 
     int splits = spreadBeam(diagram, rows, startX + 1, startY);
 
-    printf("The beam splitted '%d' times\n", splits);
+    printf("The beam splitted '%ld' times\n", splits);
+
+    long int timelines = timeLines(diagram, rows, columns, startX + 1, startY);
+    printf("Total active timelines: %ld\n", timelines);
     
     return 0;
 }
